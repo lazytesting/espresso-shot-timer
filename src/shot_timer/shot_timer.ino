@@ -5,19 +5,28 @@
 elapsedMillis timer;
 LiquidCrystal_I2C lcd(0x27,20,4);
 int pin = 12; // pin for switch
+int targetTimeUpPin = 11;
+int targetTimeDownPin = 10;
 bool isCounting = false;
 int lastShots[4];
 int targetShotTime = 30;
+int targetTimeUpLastState;
+int targetTimeDownLastState;
 
 void setup()
 {
   pinMode(pin, INPUT_PULLUP);
+  pinMode(targetTimeUpPin, INPUT_PULLUP);
+  pinMode(targetTimeDownPin, INPUT_PULLUP);
   lcd.init();
   lcd.backlight();
-  lcd.setCursor(1,0);
-  lcd.print("Target : " + String(targetShotTime));
   lcd.setCursor(1,1);
   lcd.print("Actual : ");
+}
+
+void printTargetTime(){
+  lcd.setCursor(1,0);
+  lcd.print("Target : " + String(targetShotTime) + "        ");
 }
 
 void startTimer() {
@@ -71,13 +80,32 @@ void updateShotHistory(int lastShotTime) {
   lastShots[3] = tempLastShots[2];
 }
 
-void printCurrentShotTime) {
+void printCurrentShotTime() {
   lcd.setCursor(10,1);
   lcd.print(timer/1000);
 }
 
+void updateTargetTime() {
+  // Pressing up button
+  int upButton = digitalRead(targetTimeUpPin);
+  if (upButton == LOW && targetTimeUpLastState != upButton){
+    targetShotTime++;
+  }
+  targetTimeUpLastState = upButton;
+
+  // Pressing down button
+  int downButton = digitalRead(targetTimeDownPin);
+  if (downButton == LOW && targetTimeDownLastState != downButton){
+    targetShotTime--;
+  }
+  targetTimeDownLastState = downButton;
+}
+
 void loop()
-{
+{ 
+  updateTargetTime();
+  printTargetTime();
+  
   int buttonValue = digitalRead(12);
   if (buttonValue == LOW){
     if (!isCounting) {
