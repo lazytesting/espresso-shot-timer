@@ -2,12 +2,14 @@
 #include <LiquidCrystal_I2C.h>
 #include <elapsedMillis.h>
 
-elapsedMillis timer;
 LiquidCrystal_I2C lcd(0x27,20,4);
+// config
 int pin = 12; // pin for switch
 int targetTimeUpPin = 11;
 int targetTimeDownPin = 10;
 int beanSelectionPin = 8;
+
+// variables
 bool isCounting = false;
 int lastShots[4];
 int targetShotTime = 30;
@@ -16,6 +18,7 @@ int targetTimeDownLastState = 2;
 int beanSelectionLastState = 2;
 int currentBeanSelection = 1;
 int beanSelectionLimit = 2; //number of bean types
+elapsedMillis timer;
 elapsedMillis flakyTimer;
 
 void setup()
