@@ -22,5 +22,10 @@ jobs:
         run: |
           arduino-cli core update-index
           arduino-cli core install ${{ matrix.arduino-platform }}
+      - name: Install dependencies
+        run: |
+          arduino-cli lib update-index
+          arduino-cli lib install LiquidCrystal_I2C --git-url https://github.com/johnrickman/LiquidCrystal_I2C
+          arduino-cli lib install elapsedMillis 
       - name: Compile Sketch
         run: arduino-cli compile --fqbn ${{ matrix.fqbn }} ./src/shot_timer
