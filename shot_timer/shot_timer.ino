@@ -1,23 +1,24 @@
 #include <Wire.h> 
-#include <LiquidCrystal_I2C.h>
-#include <elapsedMillis.h>
+#include "src/LiquidCrystal_I2C/LiquidCrystal_I2C.h"
+#include "src/elapsedMillis/elapsedMillis.h"
 
 LiquidCrystal_I2C lcd(0x27,20,4);
 // config
-int pumpSwitchPin = 12; // pin for switch
-int targetTimeUpPin = 11;
-int targetTimeDownPin = 10;
-int beanSelectionPin = 8;
-int beanSelectionLimit = 2; //number of bean types
+const int pumpSwitchPin = 12; // pin for switch
+const int targetTimeUpPin = 11;
+const int targetTimeDownPin = 10;
+const int beanSelectionPin = 8;
+const int beanSelectionLimit = 2; //number of bean types
 
 // variables
 bool isCounting = false;
 int lastShots[4];
+String shotHistory[beanSelectionLimit];
 int targetShotTime = 30;
 int targetTimeUpLastState = 2;
 int targetTimeDownLastState = 2;
 int beanSelectionLastState = 2;
-int currentBeanSelection = 1;
+int currentBeanSelection = 1; //TODO bean selection should start on 0
 elapsedMillis timer;
 elapsedMillis flakyTimer;
 
@@ -90,7 +91,8 @@ void stopTimer(){
 }
 
 void clearShotHistory() {
-  memset(lastShots, 0, sizeof(lastShots));
+  //memset(lastShots, 0, sizeof(lastShots));
+  shotHistory[currentBeanSelection] = "";
   lcd.setCursor(1,3);
   lcd.print("History:          "); // whipe previous history
 }
@@ -101,30 +103,43 @@ void printShothistory() {
   lcd.setCursor(10,3); // move to position after colon
 
   // print all shots except the last one
-  for (int i=1; i<4; i++) {   
-    if(lastShots[i] > 0) {
-      if(i>1) {
-        lcd.print("-");
-      }
-      lcd.print(lastShots[i]);
-    }
-  }
+//  for (int i=1; i<4; i++) {   
+//    if(lastShots[i] > 0) {
+//      if(i>1) {
+//        lcd.print("-");
+//      }
+//      lcd.print(lastShots[i]);
+//    }
+//  }
+
+  lcd.print(shotHistory[currentBeanSelection - 1]);
 }
 
 void updateShotHistory(int lastShotTime) {
-  int tempLastShots[3];
-  tempLastShots[0] = lastShots[0];
-  tempLastShots[1] = lastShots[1];
-  tempLastShots[2] = lastShots[2];
+  const int maxLength = 11;
+  String shotHistory = shotHistory[currentBeanSelection - 1] + "-" + lastShotTime;
 
-  lastShots[0] = lastShotTime;
-  lastShots[1] = tempLastShots[0];
-  lastShots[2] = tempLastShots[1];
-  lastShots[3] = tempLastShots[2];
+  // get lenght
+  shotHistory.length();
 
-  if( lastShots[1] != 0) {
-    printShothistory();
-  }
+  // while lenght > max
+   // get position of first -
+   // remove everything before/on that position
+  
+  
+//  int tempLastShots[3];
+//  tempLastShots[0] = lastShots[0];
+//  tempLastShots[1] = lastShots[1];
+//  tempLastShots[2] = lastShots[2];
+//
+//  lastShots[0] = lastShotTime;
+//  lastShots[1] = tempLastShots[0];
+//  lastShots[2] = tempLastShots[1];
+//  lastShots[3] = tempLastShots[2];
+//
+//  if( lastShots[1] != 0) {
+//    printShothistory();
+//  }
 }
 
 void printActualTimer() {
