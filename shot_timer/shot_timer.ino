@@ -11,6 +11,7 @@ const int beanSelectionPin = 8;
 const int beanSelectionLimit = 2; //number of bean types
 
 // variables
+const int valuePosition = 8;
 bool isCounting = false;
 int shotHistory[beanSelectionLimit][4];
 int targetShotTime = 30;
@@ -30,7 +31,18 @@ void setup()
   
   lcd.init();
   lcd.backlight();
-  printBeanSelection();
+  printLabelsWithDefaults();
+}
+
+void printLabelsWithDefaults() {
+  lcd.setCursor(0,0);
+  lcd.print("Bean:   1");
+  lcd.setCursor(0,1);
+  lcd.print("Target: 30");
+  lcd.setCursor(0,2);
+  lcd.print("Actual: 0");
+  lcd.setCursor(0,3);
+  lcd.print("Past:");
 }
 
 void updateBeanSelection() {
@@ -48,28 +60,32 @@ void updateBeanSelection() {
 }
 
 void printBeanSelection() {
-  lcd.setCursor(1,0);
-  lcd.print("Bean : " + String(currentBeanSelection + 1) + "        ");
+  lcd.setCursor(valuePosition, 0);
+  lcd.print(String(currentBeanSelection + 1));
 }
 
 void updateTargetTimer() {
   // Pressing up button
   int upButton = digitalRead(targetTimeUpPin);
   if (upButton == LOW && targetTimeUpLastState != upButton){
-    targetShotTime++;
+    if (targetShotTime < 99) {
+      targetShotTime++;
+    }
   }
   targetTimeUpLastState = upButton;
 
   // Pressing down button
   int downButton = digitalRead(targetTimeDownPin);
   if (downButton == LOW && targetTimeDownLastState != downButton){
-    targetShotTime--;
+    if (targetShotTime > 0) {
+      targetShotTime--;
+    } 
   }
   targetTimeDownLastState = downButton;
 
   // print
-  lcd.setCursor(1,1);
-  lcd.print("Target : " + String(targetShotTime) + "        ");
+  lcd.setCursor(valuePosition, 1);
+  lcd.print(String(targetShotTime) + "        ");
 }
 
 void startTimer() {
@@ -80,7 +96,7 @@ void startTimer() {
 void stopTimer(){
   isCounting = false;
   int currentShotTime = (timer - flakyTimer) /1000;
-  if (currentShotTime < 3) {
+  if (currentShotTime < 10) {
     // not counting this, probably a flush
     return;
   }
@@ -89,18 +105,18 @@ void stopTimer(){
 }
 
 void printShothistory() {
-  lcd.setCursor(1,3);
-  lcd.print("History:          "); // whipe previous history
+  lcd.setCursor(valuePosition, 3);
+  lcd.print("            "); // whipe previous history
 
   if (shotHistory[currentBeanSelection][0] == 0) {
     //nothing to display
     return;
   }
   
-  lcd.setCursor(10,3); // move to position after colon
+  lcd.setCursor(valuePosition,3); // move to position after colon
 
   // print history
-  for (int i=0; i<=4; i++) {   
+  for (int i=0; i<4; i++) {   
     if(shotHistory[currentBeanSelection][i] > 0) {
       if(i>0) {
         lcd.print("-");
@@ -111,6 +127,11 @@ void printShothistory() {
 }
 
 void updateShotHistory(int lastShotTime) {
+  // limit to 2 characters
+  if (lastShotTime > 99) {
+    lastShotTime = 99;
+  }
+
   int tempLastShots[3];
   // copy into temp array
   tempLastShots[0] = shotHistory[currentBeanSelection][0];
@@ -128,9 +149,9 @@ void updateShotHistory(int lastShotTime) {
 
 void printActualTimer() {
   if (isCounting) {
-    lcd.setCursor(1,2);
+    lcd.setCursor(valuePosition, 2);
     String actual = String(timer/1000);
-    lcd.print("Actual : " + actual + "    ");
+    lcd.print(actual + "    ");
   }
 }
 
