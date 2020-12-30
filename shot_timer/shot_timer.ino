@@ -80,7 +80,7 @@ void startTimer() {
 void stopTimer(){
   isCounting = false;
   int currentShotTime = (timer - flakyTimer) /1000;
-  if (currentShotTime < 1o) {
+  if (currentShotTime < 10) {
     // not counting this, probably a flush
     return;
   }
