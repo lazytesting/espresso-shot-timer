@@ -1,7 +1,8 @@
 #include <unity.h>
-#include "../src/bla/bla.cpp"
+#include <bla.h>
 
 
+Bla bla;
 // void setUp(void) {
 // // set stuff up here
 // }
@@ -10,13 +11,14 @@
 // // clean stuff up here
 // }
 
-void test_led_builtin_pin_number(void) {
-    TEST_ASSERT_EQUAL(12, 12);
+void example_test(void) {
+    int actual = bla.yolo();
+    TEST_ASSERT_EQUAL(1, actual);
 }
 
 int main(int argc, char **argv) {
     UNITY_BEGIN();
-    RUN_TEST(test_led_builtin_pin_number);
+    RUN_TEST(example_test);
     UNITY_END();
 
     return 0;
