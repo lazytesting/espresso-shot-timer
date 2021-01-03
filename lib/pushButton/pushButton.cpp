@@ -1,21 +1,25 @@
 #include <pushButton.h>
 
-bool hasBeenActivated = false;
-const int pushState = 0;
+int lastState;
+int currentState;
+int pushState;
+
+PushButton::PushButton(int state) {
+  pushState = state;
+}
 
 void PushButton::updateState(int state)
 {
-  if (state == pushState) {
-    hasBeenActivated = true;
-  }
+  currentState = state;
 }
 
 bool PushButton::isPushed()
 {
-  if (hasBeenActivated) {
-    // reset
-    hasBeenActivated = false;
-    return true;
+  bool isPushed = false;
+  if (currentState == pushState && currentState != lastState) {
+    isPushed = true;
   }
-  return false;
+  lastState = currentState;
+
+  return isPushed;
 }
