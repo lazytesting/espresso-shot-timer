@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 #include <elapsedMillis.h>
@@ -21,6 +22,16 @@ elapsedMillis flakyTimer;
 PushButton targetTimeUpButton(LOW);
 PushButton targetTimeDownButton(LOW);
 PushButton selectBeanButton(LOW);
+
+void printBeanSelection();
+void updateBeanSelection();
+void updateTargetTimer();
+void startTimer();
+void stopTimer();
+void printShothistory();
+void updateShotHistory(int);
+void updateActualTimer();
+void updateButtonStates();
 
 void setup()
 {
