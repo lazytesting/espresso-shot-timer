@@ -1,6 +1,8 @@
+#include <Arduino.h>
 #include <Wire.h> 
-#include "src/LiquidCrystal_I2C/LiquidCrystal_I2C.h"
-#include "src/elapsedMillis/elapsedMillis.h"
+#include <LiquidCrystal_I2C.h>
+#include <elapsedMillis.h>
+#include <pushButton.h>
 
 LiquidCrystal_I2C lcd(0x27,20,4);
 // config
@@ -15,12 +17,23 @@ const int valuePosition = 8;
 bool isCounting = false;
 int shotHistory[beanSelectionLimit][4];
 int targetShotTime = 30;
-int targetTimeUpLastState = 2;
-int targetTimeDownLastState = 2;
-int beanSelectionLastState = 2;
 int currentBeanSelection = 0;
 elapsedMillis timer;
 elapsedMillis flakyTimer;
+PushButton targetTimeUpButton(LOW);
+PushButton targetTimeDownButton(LOW);
+PushButton selectBeanButton(LOW);
+
+void printBeanSelection();
+void updateBeanSelection();
+void updateTargetTimer();
+void startTimer();
+void stopTimer();
+void printShothistory();
+void updateShotHistory(int);
+void updateActualTimer();
+void updateButtonStates();
+void printLabelsWithDefaults();
 
 void setup()
 {
@@ -46,8 +59,7 @@ void printLabelsWithDefaults() {
 }
 
 void updateBeanSelection() {
-  int beanSelectionButton = digitalRead(beanSelectionPin);
-  if (beanSelectionButton == LOW && beanSelectionLastState != beanSelectionButton){    
+  if (selectBeanButton.isPushed()){    
     if(currentBeanSelection + 1 < beanSelectionLimit) {
       currentBeanSelection++;
     } else {
@@ -56,7 +68,6 @@ void updateBeanSelection() {
     printBeanSelection();
     printShothistory();
   }
-  beanSelectionLastState = beanSelectionButton;
 }
 
 void printBeanSelection() {
@@ -65,23 +76,12 @@ void printBeanSelection() {
 }
 
 void updateTargetTimer() {
-  // Pressing up button
-  int upButton = digitalRead(targetTimeUpPin);
-  if (upButton == LOW && targetTimeUpLastState != upButton){
-    if (targetShotTime < 99) {
-      targetShotTime++;
-    }
+  if (targetTimeUpButton.isPushed() && targetShotTime < 99){
+    targetShotTime++;
   }
-  targetTimeUpLastState = upButton;
-
-  // Pressing down button
-  int downButton = digitalRead(targetTimeDownPin);
-  if (downButton == LOW && targetTimeDownLastState != downButton){
-    if (targetShotTime > 0) {
-      targetShotTime--;
-    } 
+  if (targetTimeDownButton.isPushed() && targetShotTime > 0){
+    targetShotTime--;
   }
-  targetTimeDownLastState = downButton;
 
   // print
   lcd.setCursor(valuePosition, 1);
@@ -171,8 +171,17 @@ void updateActualTimer() {
   printActualTimer();
 }
 
+
+void updateButtonStates() {
+  targetTimeUpButton.updateState(digitalRead(targetTimeUpPin));
+  targetTimeDownButton.updateState(digitalRead(targetTimeDownPin));
+  selectBeanButton.updateState(digitalRead(beanSelectionPin));
+}
+
 void loop()
 { 
+  updateButtonStates();
+
   updateBeanSelection();
   updateTargetTimer();
   updateActualTimer();
