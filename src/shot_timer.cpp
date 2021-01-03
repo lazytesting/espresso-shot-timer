@@ -33,6 +33,7 @@ void printShothistory();
 void updateShotHistory(int);
 void updateActualTimer();
 void updateButtonStates();
+void printLabelsWithDefaults();
 
 void setup()
 {
